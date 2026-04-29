@@ -1,0 +1,61 @@
+# 依赖目录
+node_modules/
+backend/venv/
+backend/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# 数据库文件（保护隐私数据）
+*.db
+*.sqlite
+*.sqlite3
+
+# 环境配置文件（保护隐私）
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE配置
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 缓存文件
+.cache/
+.parcel-cache/
+
+# 构建输出
+dist/
+build/
+
+# 测试覆盖率
+coverage/
+*.lcov
+
+# Python相关
+*.egg-info/
+.venv/
+env/
+venv/
+
+# Node.js相关
+.npm
+.eslintcache
+
+# 系统文件
+.DS_Store
+Thumbs.db
