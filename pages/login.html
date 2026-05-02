@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - AI智能股票预测平台</title>
+    <meta name="description" content="登录AI智能股票预测平台，开启智能投资之旅">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link href="../css/main.css" rel="stylesheet">
+    
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .auth-left-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .auth-right {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .auth-form {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .auth-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .auth-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid var(--border-light);
+            padding: 1rem;
+            transition: var(--transition-base);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(26, 133, 255, 0.25);
+        }
+        
+        .btn-auth {
+            border-radius: 10px;
+            padding: 1rem;
+            font-weight: 600;
+            transition: var(--transition-base);
+        }
+        
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-blue);
+        }
+        
+        .auth-divider {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-light);
+        }
+        
+        .auth-divider span {
+            background: white;
+            padding: 0 1rem;
+            color: var(--text-secondary);
+            position: relative;
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            background: white;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: var(--transition-base);
+        }
+        
+        .social-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .auth-footer a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .feature-list i {
+            margin-right: 0.75rem;
+            color: var(--accent-gold);
+        }
+        
+        .input-group-text {
+            background: var(--neutral-light);
+            border: 2px solid var(--border-light);
+            border-right: none;
+        }
+        
+        .validation-feedback {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .is-invalid {
+            border-color: var(--danger-red) !important;
+        }
+        
+        .invalid-feedback {
+            color: var(--danger-red);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .auth-card {
+                flex-direction: column;
+                margin: 1rem;
+            }
+            
+            .auth-left {
+                padding: 2rem;
+                text-align: center;
+            }
+            
+            .auth-right {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- 左侧介绍区域 -->
+            <div class="auth-left">
+                <div class="auth-left-content">
+                    <div class="auth-logo">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        AI股票预测
+                    </div>
+                    <h2 class="mb-3">开启智能投资之旅</h2>
+                    <p class="mb-4">基于AI和区块链技术的智能股票预测平台，助您做出更明智的投资决策</p>
+                    
+                    <ul class="feature-list">
+                        <li><i class="bi bi-check-circle-fill"></i> AI智能预测，准确率高达85%</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 区块链存证，数据真实可靠</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 实时行情，5分钟更新</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 社区互动，智慧共享</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 积分奖励，多重福利</li>
+                    </ul>
+                    
+                    <div class="mt-auto">
+                        <h5 class="mb-3">已有账号？</h5>
+                        <p>立即登录，体验完整功能</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧登录表单 -->
+            <div class="auth-right">
+                <div class="auth-form">
+                    <div class="text-center mb-4">
+                        <h3 class="auth-title">欢迎回来</h3>
+                        <p class="auth-subtitle">登录您的账号继续使用</p>
+                    </div>
+                    
+                    <form id="loginForm">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="username" placeholder="用户名或邮箱" required>
+                            <label for="username">
+                                <i class="bi bi-person"></i> 用户名或邮箱
+                            </label>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" placeholder="密码" required>
+                            <label for="password">
+                                <i class="bi bi-lock"></i> 密码
+                            </label>
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="bi bi-eye" id="passwordToggle"></i>
+                            </button>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                记住登录状态（7天）
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-auth w-100 mb-3">
+                            <i class="bi bi-box-arrow-in-right"></i> 登录
+                        </button>
+                    </form>
+                    
+                    <div class="auth-divider">
+                        <span>或</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <a href="#" class="social-btn">
+                            <i class="bi bi-wechat"></i> 微信
+                        </a>
+                        <a href="#" class="social-btn">
+                            <i class="bi bi-qq"></i> QQ
+                        </a>
+                        <a href="#" class="social-btn">
+                            <i class="bi bi-github"></i> GitHub
+                        </a>
+                    </div>
+                    
+                    <div class="auth-footer">
+                        <p>还没有账号？ <a href="register.html">立即注册</a></p>
+                        <p><a href="#" onclick="showForgotPassword()">忘记密码？</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 忘记密码模态框 -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">重置密码</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="forgotPasswordForm">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="resetEmail" placeholder="邮箱地址" required>
+                            <label for="resetEmail">
+                                <i class="bi bi-envelope"></i> 邮箱地址
+                            </label>
+                            <div class="form-text">我们将向您的邮箱发送密码重置链接</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">发送重置链接</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 自定义JS -->
+    <script src="../js/navbar.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>

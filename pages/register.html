@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - AI智能股票预测平台</title>
+    <meta name="description" content="注册AI智能股票预测平台，开启智能投资之旅">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link href="../css/main.css" rel="stylesheet">
+    
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 1200px;
+            width: 100%;
+            display: flex;
+            min-height: 700px;
+        }
+        
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .auth-left-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .auth-right {
+            flex: 1.2;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        
+        .auth-form {
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .auth-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .auth-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .form-floating {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-floating > label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: 1rem 0.75rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            pointer-events: none;
+            transform-origin: 0 0;
+            transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+        }
+
+        .form-floating > .form-control {
+            padding: 1.625rem 0.75rem 0.625rem;
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            opacity: 0.65;
+            transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid var(--border-light);
+            padding: 1rem;
+            transition: var(--transition-base);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(26, 133, 255, 0.25);
+        }
+        
+        .btn-auth {
+            border-radius: 10px;
+            padding: 1rem;
+            font-weight: 600;
+            transition: var(--transition-base);
+        }
+        
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-blue);
+        }
+        
+        .auth-divider {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-light);
+        }
+        
+        .auth-divider span {
+            background: white;
+            padding: 0 1rem;
+            color: var(--text-secondary);
+            position: relative;
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--border-light);
+            background: white;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: var(--transition-base);
+        }
+        
+        .social-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .auth-footer a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .feature-list i {
+            margin-right: 0.75rem;
+            color: var(--accent-gold);
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-light);
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        
+        .strength-weak {
+            background: var(--danger-red);
+            width: 33%;
+        }
+        
+        .strength-medium {
+            background: var(--warning-orange);
+            width: 66%;
+        }
+        
+        .strength-strong {
+            background: var(--success-green);
+            width: 100%;
+        }
+        
+        .validation-feedback {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .is-invalid {
+            border-color: var(--danger-red) !important;
+        }
+        
+        .is-valid {
+            border-color: var(--success-green) !important;
+        }
+        
+        .invalid-feedback {
+            color: var(--danger-red);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .valid-feedback {
+            color: var(--success-green);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .terms-checkbox {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .terms-checkbox .form-check {
+            margin-bottom: 0;
+        }
+        
+        .progress-step {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .progress-step::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-light);
+            z-index: 1;
+        }
+        
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .step.completed {
+            background: var(--success-green);
+            color: white;
+            border-color: var(--success-green);
+        }
+        
+        @media (max-width: 768px) {
+            .auth-card {
+                flex-direction: column;
+                margin: 1rem;
+            }
+            
+            .auth-left {
+                padding: 2rem;
+                text-align: center;
+            }
+            
+            .auth-right {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- 左侧介绍区域 -->
+            <div class="auth-left">
+                <div class="auth-left-content">
+                    <div class="auth-logo">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        AI股票预测
+                    </div>
+                    <h2 class="mb-3">加入我们，开启智能投资</h2>
+                    <p class="mb-4">注册账号，享受AI智能预测、区块链存证、社区互动等全方位服务</p>
+                    
+                    <ul class="feature-list">
+                        <li><i class="bi bi-check-circle-fill"></i> 免费注册，立享20积分奖励</li>
+                        <li><i class="bi bi-check-circle-fill"></i> AI预测，准确率高达85%</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 区块链存证，数据真实可靠</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 社区互动，智慧共享</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 积分兑换，多重福利</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 专业技术支持，7×24小时服务</li>
+                    </ul>
+                    
+                    <div class="mt-auto">
+                        <h5 class="mb-3">已有账号？</h5>
+                        <p>立即登录，体验完整功能</p>
+                        <a href="login.html" class="btn btn-outline-light">
+                            <i class="bi bi-box-arrow-in-right"></i> 立即登录
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧注册表单 -->
+            <div class="auth-right">
+                <div class="auth-form">
+                    <div class="text-center mb-4">
+                        <h3 class="auth-title">创建新账号</h3>
+                        <p class="auth-subtitle">填写信息，开启智能投资之旅</p>
+                    </div>
+                    
+                    <!-- 进度指示器 -->
+                    <div class="progress-step mb-4">
+                        <div class="step active" id="step1">1</div>
+                        <div class="step" id="step2">2</div>
+                        <div class="step" id="step3">3</div>
+                    </div>
+                    
+                    <form id="registerForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="username" placeholder="用户名" required>
+                                    <label for="username">
+                                        <i class="bi bi-person"></i> 用户名
+                                    </label>
+                                    <div class="invalid-feedback"></div>
+                                    <div class="valid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="email" class="form-control" id="email" placeholder="邮箱地址" required>
+                                    <label for="email">
+                                        <i class="bi bi-envelope"></i> 邮箱地址
+                                    </label>
+                                    <div class="invalid-feedback"></div>
+                                    <div class="valid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="tel" class="form-control" id="phone" placeholder="手机号码（可选）">
+                            <label for="phone">
+                                <i class="bi bi-phone"></i> 手机号码（可选）
+                            </label>
+                            <div class="form-text">用于接收重要通知和验证码</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="password" placeholder="密码" required>
+                                    <label for="password">
+                                        <i class="bi bi-lock"></i> 密码
+                                    </label>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                        <i class="bi bi-eye" id="passwordToggle"></i>
+                                    </button>
+                                    <div class="password-strength">
+                                        <div class="password-strength-bar" id="passwordStrength"></div>
+                                    </div>
+                                    <div class="form-text">密码需包含字母和数字，至少8位</div>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="password" class="form-control" id="confirmPassword" placeholder="确认密码" required>
+                                    <label for="confirmPassword">
+                                        <i class="bi bi-lock-fill"></i> 确认密码
+                                    </label>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                                        <i class="bi bi-eye" id="confirmPasswordToggle"></i>
+                                    </button>
+                                    <div class="invalid-feedback"></div>
+                                    <div class="valid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 验证码 -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="captcha" placeholder="验证码" required>
+                                    <label for="captcha">
+                                        <i class="bi bi-shield-check"></i> 验证码
+                                    </label>
+                                    <div class="invalid-feedback"></div>
+                                    <div class="valid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center h-100">
+                                    <canvas id="captchaCanvas" width="120" height="50" style="border: 2px solid var(--border-light); border-radius: 8px; cursor: pointer;" onclick="generateCaptcha()"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 服务条款 -->
+                        <div class="terms-checkbox">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                <label class="form-check-label" for="agreeTerms">
+                                    我已阅读并同意 <a href="#" onclick="showTerms()">《用户服务协议》</a> 和 <a href="#" onclick="showPrivacy()">《隐私政策》</a>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="subscribeNewsletter">
+                                <label class="form-check-label" for="subscribeNewsletter">
+                                    订阅投资资讯和平台动态（可选）
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-auth w-100 mb-3">
+                            <i class="bi bi-person-plus"></i> 立即注册
+                        </button>
+                        
+                        <div class="auth-divider">
+                            <span>或使用以下方式注册</span>
+                        </div>
+                        
+                        <div class="social-login">
+                            <a href="#" class="social-btn">
+                                <i class="bi bi-wechat"></i> 微信
+                            </a>
+                            <a href="#" class="social-btn">
+                                <i class="bi bi-qq"></i> QQ
+                            </a>
+                            <a href="#" class="social-btn">
+                                <i class="bi bi-github"></i> GitHub
+                            </a>
+                        </div>
+                        
+                        <div class="auth-footer">
+                            <p>已有账号？ <a href="login.html">立即登录</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 服务条款模态框 -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">用户服务协议</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>1. 服务说明</h6>
+                    <p>AI智能股票预测平台为用户提供股票预测、数据分析、社区交流等服务。所有预测仅供参考，不构成投资建议。</p>
+                    
+                    <h6>2. 用户责任</h6>
+                    <p>用户应当提供真实信息，遵守法律法规，不得发布违法内容。投资决策应当谨慎，平台不对投资损失承担责任。</p>
+                    
+                    <h6>3. 隐私保护</h6>
+                    <p>平台严格保护用户隐私，采用加密技术和区块链存证确保数据安全。</p>
+                    
+                    <h6>4. 知识产权</h6>
+                    <p>平台内容受知识产权保护，用户发布内容版权归用户所有。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">我已了解</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 隐私政策模态框 -->
+    <div class="modal fade" id="privacyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">隐私政策</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>1. 信息收集</h6>
+                    <p>我们收集用户注册信息、使用行为数据等，用于提供服务和改善用户体验。</p>
+                    
+                    <h6>2. 信息使用</h6>
+                    <p>收集的信息用于账号管理、服务提供、安全防护、数据分析等目的。</p>
+                    
+                    <h6>3. 信息保护</h6>
+                    <p>采用加密存储、传输加密、访问控制等技术保护用户信息安全。</p>
+                    
+                    <h6>4. 信息共享</h6>
+                    <p>未经用户同意，不会向第三方共享个人信息，法律法规要求除外。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">我已了解</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 自定义JS -->
+    <script src="../js/navbar.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>
