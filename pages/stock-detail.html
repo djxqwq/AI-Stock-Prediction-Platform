@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票详情 - AI智能股票预测平台</title>
+    <meta name="description" content="股票详细信息、实时行情、K线图、AI预测分析">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <!-- 自定义CSS -->
+    <link href="../css/main.css" rel="stylesheet">
+    
+    <style>
+        .stock-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+        
+        .price-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-change {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .k-line-container {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+        }
+        
+        .financial-indicator {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+        }
+        
+        .financial-indicator:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .indicator-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .indicator-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-light);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .suggestion-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-light);
+            transition: var(--transition-base);
+        }
+        
+        .suggestion-item:hover {
+            background: var(--neutral-light);
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 0 0 16px 16px;
+            padding: 2rem;
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid var(--primary-blue);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            transition: var(--transition-base);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-blue);
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .prediction-result {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .confidence-bar {
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green) 0%, var(--primary-blue) 100%);
+            transition: width 1s ease-out;
+        }
+        
+        .time-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .time-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-light);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        
+        .time-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .time-btn:hover {
+            border-color: var(--primary-blue);
+        }
+        
+        /* AI分析样式 */
+        .ai-analysis {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .analysis-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .analysis-header h6 {
+            color: #333;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .analysis-content {
+            margin-bottom: 1rem;
+        }
+        
+        .analysis-text {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .analysis-footer {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .analysis-footer .btn {
+            font-size: 0.875rem;
+        }
+        
+        /* 价格趋势图样式 */
+        .price-trend-container {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .k-line-container {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        canvas {
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <i class="bi bi-graph-up-arrow"></i>
+                AI股票预测
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">
+                            <i class="bi bi-house-door"></i> 首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="stock-detail.html">
+                            <i class="bi bi-search"></i> 股票搜索
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ai-prediction.html">
+                            <i class="bi bi-robot"></i> AI预测
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ai-qa.html">
+                            <i class="bi bi-chat-dots"></i> AI问答
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="community.html">
+                            <i class="bi bi-people"></i> 社区
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> 个人中心
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="profile.html">
+                                <i class="bi bi-person"></i> 个人信息
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-gift"></i> 积分: <span id="userPoints">0</span>
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">
+                                <i class="bi bi-box-arrow-right"></i> 退出登录
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">
+                            <i class="bi bi-box-arrow-in-right"></i> 登录
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 搜索区域 -->
+    <section class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="position-relative">
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="stockSearchInput" placeholder="搜索股票代码或名称...">
+                        <button class="search-btn" onclick="searchStock()">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                    <div class="search-suggestions" id="searchSuggestions"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 股票详情区域 -->
+    <main class="container" id="stockDetailContainer" style="display: none;">
+        <!-- 股票头部信息 -->
+        <section class="stock-header mb-4">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-2">
+                            <span id="stockCode">000001</span> 
+                            <span id="stockName">平安银行</span>
+                        </h1>
+                        <div class="price-display" id="currentPrice">¥12.45</div>
+                        <div class="price-change" id="priceChange">
+                            <i class="bi bi-arrow-up"></i> +0.23 (+1.88%)
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <button class="btn btn-light btn-lg me-2" onclick="toggleFavorite()">
+                            <i class="bi bi-star" id="favoriteIcon"></i> 收藏
+                        </button>
+                        <button class="btn btn-outline-light btn-lg me-2" onclick="shareStock()">
+                            <i class="bi bi-share"></i> 分享
+                        </button>
+                        <button class="btn btn-primary btn-lg" onclick="downloadReport()">
+                            <i class="bi bi-download"></i> 下载报告
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关键指标 -->
+        <section class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="financial-indicator">
+                    <div class="indicator-value" id="openPrice">12.30</div>
+                    <div class="indicator-label">开盘价</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="financial-indicator">
+                    <div class="indicator-value" id="highPrice">12.58</div>
+                    <div class="indicator-label">最高价</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="financial-indicator">
+                    <div class="indicator-value" id="lowPrice">12.25</div>
+                    <div class="indicator-label">最低价</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="financial-indicator">
+                    <div class="indicator-value" id="volume">1.2亿</div>
+                    <div class="indicator-label">成交量</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- K线图和标签页 -->
+        <section class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#kline-tab">K线图</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#financial-tab">财务指标</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#ai-prediction-tab">AI预测</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#news-tab">相关资讯</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <!-- K线图标签页 -->
+                        <div class="tab-pane fade show active" id="kline-tab">
+                            <div class="time-selector">
+                                <button class="time-btn" onclick="changeKLinePeriod('1d')">日K</button>
+                                <button class="time-btn active" onclick="changeKLinePeriod('1w')">周K</button>
+                                <button class="time-btn" onclick="changeKLinePeriod('1m')">月K</button>
+                                <button class="time-btn" onclick="changeKLinePeriod('3m')">季K</button>
+                                <button class="time-btn" onclick="changeKLinePeriod('1y')">年K</button>
+                            </div>
+                            <div class="k-line-container">
+                                <canvas id="klineChart" height="100"></canvas>
+                            </div>
+                            
+                            <!-- 价格趋势图 -->
+                            <div class="mt-4">
+                                <h5 class="mb-3">价格走势图</h5>
+                                <div class="price-trend-container">
+                                    <canvas id="priceTrendChart" height="80"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 财务指标标签页 -->
+                        <div class="tab-pane fade" id="financial-tab">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="financial-indicator">
+                                        <div class="indicator-value">6.85</div>
+                                        <div class="indicator-label">市盈率(PE)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="financial-indicator">
+                                        <div class="indicator-value">0.75</div>
+                                        <div class="indicator-label">市净率(PB)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="financial-indicator">
+                                        <div class="indicator-value">12.5%</div>
+                                        <div class="indicator-label">净资产收益率(ROE)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="financial-indicator">
+                                        <div class="indicator-value">15.8%</div>
+                                        <div class="indicator-label">毛利率</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="financial-indicator">
+                                        <div class="indicator-value">8.2%</div>
+                                        <div class="indicator-label">净利率</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="financial-indicator">
+                                        <div class="indicator-value">2.5%</div>
+                                        <div class="indicator-label">营收增长率</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="financial-indicator">
+                                        <div class="indicator-value">18.5%</div>
+                                        <div class="indicator-label">净利润增长率</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="financial-indicator">
+                                        <div class="indicator-value">2856亿</div>
+                                        <div class="indicator-label">总市值</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI预测标签页 -->
+                        <div class="tab-pane fade" id="ai-prediction-tab">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h4 class="mb-0">DeepSeek AI 股票分析</h4>
+                                        <button class="btn btn-primary" id="analyzeButton" onclick="analyzeStockWithAI(currentStockCode)">
+                                            <i class="bi bi-cpu"></i> AI分析
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="analysisResult" class="mb-4">
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="bi bi-robot display-4"></i>
+                                            <p class="mt-2">点击"AI分析"按钮获取DeepSeek智能分析</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h4 class="mb-3">AI智能预测分析</h4>
+                                    <div class="prediction-result">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5>预测方向</h5>
+                                            <span class="badge bg-success fs-6">看涨 ↗</span>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <p><strong>目标价格:</strong> ¥13.50</p>
+                                                <p><strong>预期收益:</strong> +8.43%</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>预测周期:</strong> 短期 (1-2周)</p>
+                                                <p><strong>更新时间:</strong> 2024-01-15 14:30</p>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span>置信度</span>
+                                                <span>85%</span>
+                                            </div>
+                                            <div class="confidence-bar">
+                                                <div class="confidence-fill" style="width: 85%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <h6>分析依据:</h6>
+                                            <ul>
+                                                <li>技术指标：MACD金叉，RSI处于合理区间</li>
+                                                <li>基本面：Q3业绩超预期，营收增长稳健</li>
+                                                <li>市场情绪：资金流入明显，机构关注度提升</li>
+                                                <li>行业前景：银行业整体估值偏低，政策利好</li>
+                                            </ul>
+                                        </div>
+                                        <div class="mt-3">
+                                            <canvas id="predictionChart" style="height: 200px !important; max-height: 200px !important;"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h5 class="mb-3">快速操作</h5>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary" onclick="goToAIPrediction()">
+                                            <i class="bi bi-robot"></i> 获取详细预测
+                                        </button>
+                                        <button class="btn btn-outline-primary" onclick="saveToBlockchain()">
+                                            <i class="bi bi-link-45deg"></i> 区块链存证
+                                        </button>
+                                        <button class="btn btn-outline-secondary" onclick="setAlert()">
+                                            <i class="bi bi-bell"></i> 设置价格提醒
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <h6>历史预测准确率</h6>
+                                        <div class="progress" style="height: 25px;">
+                                            <div class="progress-bar bg-success" style="width: 78%">78%</div>
+                                        </div>
+                                        <small class="text-muted">基于过去30天预测数据</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 相关资讯标签页 -->
+                        <div class="tab-pane fade" id="news-tab">
+                            <div id="newsContainer">
+                                <!-- 新闻内容将通过JavaScript动态加载 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 空状态（搜索前显示） -->
+    <div class="container text-center py-5" id="emptyState">
+        <i class="bi bi-search" style="font-size: 4rem; color: var(--text-secondary);"></i>
+        <h3 class="mt-3 mb-2">搜索股票信息</h3>
+        <p class="text-muted">输入股票代码或名称，查看详细行情和AI预测分析</p>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 自定义JS -->
+    <script src="../js/navbar.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/stock-detail.js"></script>
+</body>
+</html>
