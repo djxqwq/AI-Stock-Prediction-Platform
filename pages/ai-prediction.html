@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI预测中心 - AI智能股票预测平台</title>
+    <meta name="description" content="AI智能股票预测，基于深度学习的精准趋势分析">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <!-- 自定义CSS -->
+    <link href="../css/main.css" rel="stylesheet">
+    
+    <style>
+        .prediction-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .prediction-form {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+        
+        .form-floating label {
+            color: var(--text-secondary);
+        }
+        
+        .time-range-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .time-range-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--border-light);
+            background: white;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        
+        .time-range-btn:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+        
+        .time-range-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .time-range-btn .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .time-range-btn .title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .time-range-btn .desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .prediction-result {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .result-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .direction-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .direction-up {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+        }
+        
+        .direction-down {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+        }
+        
+        .direction-stable {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-orange);
+        }
+        
+        .confidence-meter {
+            margin: 2rem 0;
+        }
+        
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .confidence-bar {
+            height: 12px;
+            background: var(--border-light);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green) 0%, var(--primary-blue) 100%);
+            transition: width 2s ease-out;
+            border-radius: 6px;
+        }
+        
+        .analysis-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .analysis-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .prediction-chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            margin-top: 2rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .history-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-blue);
+            transition: var(--transition-base);
+        }
+        
+        .history-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .accuracy-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .accuracy-high {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+        }
+        
+        .accuracy-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-orange);
+        }
+        
+        .accuracy-low {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-red);
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .loading-spinner-lg {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-light);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <i class="bi bi-graph-up-arrow"></i>
+                AI股票预测
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">
+                            <i class="bi bi-house-door"></i> 首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="stock-detail.html">
+                            <i class="bi bi-search"></i> 股票搜索
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="ai-prediction.html">
+                            <i class="bi bi-robot"></i> AI预测
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ai-qa.html">
+                            <i class="bi bi-chat-dots"></i> AI问答
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="community.html">
+                            <i class="bi bi-people"></i> 社区
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> 个人中心
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="profile.html">
+                                <i class="bi bi-person"></i> 个人信息
+                            </a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-gift"></i> 积分: <span id="userPoints">0</span>
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logout()">
+                                <i class="bi bi-box-arrow-right"></i> 退出登录
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">
+                            <i class="bi bi-box-arrow-in-right"></i> 登录
+                        </a>
+                        </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面头部 -->
+    <header class="prediction-header">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">AI智能预测中心</h1>
+            <p class="lead mb-0">基于深度学习的股票趋势预测，助您做出明智投资决策</p>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container my-5">
+        <!-- 预测表单 -->
+        <section class="prediction-form">
+            <h3 class="mb-4">
+                <i class="bi bi-robot text-primary"></i> 开始AI预测
+            </h3>
+            
+            <form id="predictionForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="stockInput" placeholder="股票代码/名称" required>
+                            <label for="stockInput">股票代码/名称</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="form-floating">
+                            <select class="form-select" id="modelSelect">
+                                <option value="basic">基础模型</option>
+                                <option value="advanced" selected>高级模型</option>
+                                <option value="premium">专业模型</option>
+                            </select>
+                            <label for="modelSelect">预测模型</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5 class="mb-3">预测周期</h5>
+                    <div class="time-range-selector">
+                        <div class="time-range-btn" data-period="short" onclick="selectTimeRange('short')">
+                            <div class="icon">⚡</div>
+                            <div class="title">短期</div>
+                            <div class="desc">1-7天</div>
+                        </div>
+                        <div class="time-range-btn active" data-period="medium" onclick="selectTimeRange('medium')">
+                            <div class="icon">📊</div>
+                            <div class="title">中期</div>
+                            <div class="desc">1-4周</div>
+                        </div>
+                        <div class="time-range-btn" data-period="long" onclick="selectTimeRange('long')">
+                            <div class="icon">📈</div>
+                            <div class="title">长期</div>
+                            <div class="desc">1-3个月</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeCommunity" checked>
+                            <label class="form-check-label" for="includeCommunity">
+                                包含社区可信度加权
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="enableRiskAnalysis" checked>
+                            <label class="form-check-label" for="enableRiskAnalysis">
+                                启用风险评估
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-cpu"></i> 开始预测
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 预测结果 -->
+        <section class="prediction-result" id="predictionResult">
+            <div class="result-header">
+                <h3>AI预测结果</h3>
+                <div class="direction-indicator direction-up" id="directionIndicator">
+                    <i class="bi bi-arrow-up"></i>
+                </div>
+                <h4 id="predictionDirection">看涨趋势</h4>
+                <p class="text-muted mb-0" id="predictionSummary">基于AI分析，该股票未来呈现上涨趋势</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <h5>目标价格</h5>
+                        <h2 class="text-primary" id="targetPrice">¥15.68</h2>
+                        <small class="text-muted" id="priceRange">区间: ¥14.50 - ¥16.80</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <h5>预期收益</h5>
+                        <h2 class="text-success" id="expectedReturn">+12.5%</h2>
+                        <small class="text-muted" id="returnPeriod">预测周期内</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <h5>风险等级</h5>
+                        <h2 class="text-warning" id="riskLevel">中等</h2>
+                        <small class="text-muted" id="riskScore">风险评分: 6.5/10</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="confidence-meter">
+                <div class="confidence-label">
+                    <span>预测置信度</span>
+                    <span id="confidenceValue">85%</span>
+                </div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="analysis-card">
+                        <div class="analysis-title">
+                            <i class="bi bi-graph-up text-primary"></i> 技术分析
+                        </div>
+                        <p id="technicalAnalysis">MACD指标显示金叉形态，RSI处于合理区间，成交量温和放大，短期技术面偏多。</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="analysis-card">
+                        <div class="analysis-title">
+                            <i class="bi bi-building text-primary"></i> 基本面分析
+                        </div>
+                        <p id="fundamentalAnalysis">公司Q3业绩超预期，营收同比增长18.5%，净利润增长22.3%，行业地位稳固。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prediction-chart-container">
+                <h5 class="mb-3">价格趋势预测图</h5>
+                <canvas id="predictionChart" style="height: 200px !important; max-height: 200px !important;"></canvas>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="savePrediction()">
+                    <i class="bi bi-save"></i> 保存预测
+                </button>
+                <button class="btn btn-outline-primary" onclick="blockchainCertify()">
+                    <i class="bi bi-link-45deg"></i> 区块链存证
+                </button>
+                <button class="btn btn-outline-secondary" onclick="sharePrediction()">
+                    <i class="bi bi-share"></i> 分享结果
+                </button>
+                <button class="btn btn-outline-info" onclick="downloadReport()">
+                    <i class="bi bi-download"></i> 下载报告
+                </button>
+            </div>
+        </section>
+
+        <!-- 功能特色 -->
+        <section class="row my-5">
+            <div class="col-12">
+                <h3 class="text-center mb-4">AI预测特色功能</h3>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h5>深度学习模型</h5>
+                    <p class="text-muted">基于LSTM、Transformer等先进算法，融合多维度数据进行预测</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h5>风险评估系统</h5>
+                    <p class="text-muted">智能识别市场风险，提供风险等级和止损建议</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5>社区智慧融合</h5>
+                    <p class="text-muted">结合社区高准确率用户的预测，提升整体预测精度</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 历史预测记录 -->
+        <section class="my-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>历史预测记录</h3>
+                <button class="btn btn-outline-primary" onclick="loadHistory()">
+                    <i class="bi bi-arrow-clockwise"></i> 刷新
+                </button>
+            </div>
+            <div id="historyContainer">
+                <!-- 历史记录将通过JavaScript动态加载 -->
+            </div>
+        </section>
+    </main>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner-lg"></div>
+            <h5>AI正在分析中...</h5>
+            <p class="text-muted">请稍候，这可能需要几秒钟时间</p>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 自定义JS -->
+    <script src="../js/navbar.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/ai-prediction.js"></script>
+</body>
+</html>
